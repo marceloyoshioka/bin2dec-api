@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pet.model.ConversorResponse;
 import com.pet.service.ConversorService;
 
 @RestController
@@ -15,17 +16,19 @@ public class ConversorController {
 	private ConversorService service;
 	
 	@GetMapping(value = {"/bin2dec/{binario}", "/bin2dec/"})
-	public ResponseEntity<String> bin2dec(@PathVariable(required = false) String binario) {
+	public ResponseEntity<ConversorResponse> bin2dec(@PathVariable(required = false) String binario) {
 		
 		if(binario == null || binario.isBlank()) {
-			return ResponseEntity.badRequest().body("O valor informado não pode ser nulo ou vazio");
+			throw new IllegalArgumentException("O valor informado não pode ser nulo ou vazio");
 		}
 		
 		if(!binario.matches("[01]+")) {
-			return ResponseEntity.badRequest().body("O valor informado não é um número binário válido");
+			throw new IllegalArgumentException("O valor informado não é um número binário válido");
 		}
+		//"Valor convertido para decimal é "+service.bin2dec(binario)
+		Integer decimal = service.bin2dec(binario);
 		
-		return ResponseEntity.ok("Valor convertido para decimal é "+service.bin2dec(binario));
+		return ResponseEntity.ok(new ConversorResponse(binario, decimal));
 		
 	}
 	
